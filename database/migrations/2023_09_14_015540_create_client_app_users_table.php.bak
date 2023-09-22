@@ -1,0 +1,35 @@
+<?php
+
+use Illuminate\Database\Migrations\Migration;
+use Illuminate\Database\Schema\Blueprint;
+use Illuminate\Support\Facades\Schema;
+use App\Models\ClientApp;
+
+return new class extends Migration
+{
+    /**
+     * Run the migrations.
+     */
+    public function up(): void
+    {
+        Schema::create('client_app_users', function (Blueprint $table) {
+            $table->id();
+            // $table->unsignedBigInteger('client_app_id');// AppUser can have access to only one app
+            $table->foreignIdFor(ClientApp::class);
+            $table->string('name');
+            $table->string('email');// Will have to check duplicity manually for each client_app_id.
+            $table->timestamp('email_verified_at')->nullable();
+            $table->string('password');
+            $table->rememberToken();
+            $table->timestamps();
+        });
+    }
+
+    /**
+     * Reverse the migrations.
+     */
+    public function down(): void
+    {
+        Schema::dropIfExists('client_app_users');
+    }
+};
