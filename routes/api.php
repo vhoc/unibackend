@@ -13,7 +13,6 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 | Here is where you can register API routes for your application. These
 | routes are loaded by the RouteServiceProvider and all of them will
 | be assigned to the "api" middleware group. Make something great!
-|
 */
 
 /*
@@ -49,6 +48,19 @@ Route::get('/email/verify', function () {
 
 // Re-send verification email.
 Route::post('/email/verification-notification', [AuthController::class, 'resendVerificationEmail'])->middleware(['throttle:10,1'])->name('verification.send');
+
+// Reset password
+Route::post('forgot-password', [AuthController::class, 'resetPassword'])->name('password.reset');
+
+// Reset password link lands here
+Route::get('forgot-password', function ( Request $request ) {
+    $token = $request->query('token');
+    $email = $request->query('email');
+
+    return redirect()->route('password.new', ['token' => $token, 'email' => $email]);
+});
+
+Route::put('forgot-password', [AuthController::class, 'processPasswordReset'])->name('password.processReset');
 
 
 

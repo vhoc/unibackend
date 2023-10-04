@@ -1,6 +1,7 @@
 <?php
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Http\Request;
 
 /*
 |--------------------------------------------------------------------------
@@ -25,3 +26,16 @@ Route::get('/email/verification/successful', function () {
 Route::get('/email/verification/failed', function () {
     return view('failed');
 })->name('verification.failed');
+
+Route::get('/forgot-password', function ( Request $request ) {
+    $token = $request->query('token');
+    $email = $request->query('email');
+
+    // TODO: Create a view with a form to handle the actual password reset.
+    // THIS DOWN BELOW IS PROVISIONAL
+    return [
+        "token" => $token,
+        "email" => $email
+    ];
+
+})->name('password.new');

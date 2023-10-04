@@ -15,10 +15,17 @@ return new class extends Migration
             $table->id();
             $table->string('name');
             $table->string('email')->unique();
+            $table->unsignedBigInteger('ecwidUserId')->nullable();
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password')->nullable();
             $table->string('google_id')->nullable();
             $table->string('apple_id')->nullable();
+            $table->enum('type', [
+                'Arquitecto',
+                'Interiorista',
+                'Otro'
+            ]);
+            $table->string('phone')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });

@@ -168,6 +168,7 @@ return [
             'rule-name' => 'custom-message',
         ],
         'All rights reserved.' => 'Todos los derechos reservados.',
+        'Hello!' => "¡Hola!",
         "Regards" => "Saludos",
         "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
     'into your web browser:' => "Si el botón \":actionText\" no funciona, puedes copiar y pegar en tu navegador la siguiente URL\n"
