@@ -57,7 +57,7 @@ Route::get('forgot-password', function ( Request $request ) {
     $token = $request->query('token');
     $email = $request->query('email');
 
-    return redirect()->route('password.new', ['token' => $token, 'email' => $email]);
+    return redirect()->route('password.redirect', ['token' => $token, 'email' => $email]);
 });
 
 Route::put('forgot-password', [AuthController::class, 'processPasswordReset'])->name('password.processReset');
@@ -77,5 +77,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::get('/user', function (Request $request) {
         return $request->user();
     });
+
+    // Reset password
+    Route::post('/user/change-password', [AuthController::class, 'changePassword']);
 
 });

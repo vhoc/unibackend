@@ -11,10 +11,15 @@ use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Auth\Events\Verified;
 use App\Http\Controllers\EcwidUserController;
 use Illuminate\Support\Facades\Password;
+use Illuminate\Validation\Rules\Password as Pass;
+use Illuminate\Auth\Events\PasswordReset;
+use Illuminate\Support\Str;
 
 class AuthController extends Controller
 {
-    
+    /**
+     * New user registration
+     */
     public function register( Request $request ) {
 
         // Validate request data
@@ -226,7 +231,10 @@ class AuthController extends Controller
         );
 
         if ( $status === Password::RESET_LINK_SENT ) {
-            return $status;
+            return response([
+                "status" => 200,
+                "message" => "El correo para restablecer tu contraseña ha sido enviado."
+            ], 200);
         }
 
         return response( [
@@ -241,7 +249,85 @@ class AuthController extends Controller
      */
     public function processPasswordReset( Request $request ) {
 
+        $request->validate([
+            'token' => 'required',
+            'email' => 'required|email',
+            'password' => ['required', 'confirmed', Pass::min(8)->mixedCase()->numbers()->symbols()],
+        ]);
+
+        $status = Password::reset(
+            $request->only('email', 'password', 'password_confirmation', 'token'),
+            function (User $user, string $password) {
+                $user->forceFill([
+                    'password' => Hash::make($password)
+                ])->setRememberToken(Str::random(60));
+     
+                $user->save();
+     
+                event(new PasswordReset($user));
+            }
+        );
+
+        if ( $status === Password::PASSWORD_RESET ) {
+            return response( [
+                "status" => 200,
+                "message" => "La nueva contraseña fue establecida con éxito.",
+            ], 200 );
+        }
+
+        return response( [
+            "status" => 422,
+            "message" => "El enlace ha expirado o ya fue utilizado",
+        ], 422 );
+
+    }
+
+    /**
+     * Change password function
+     */
+    public function changePassword( Request $request ) {
+
+        // Validate request inputs.
+        try {
+            $request->validate([
+                'email' => 'required|email',
+                'password' => ['required', 'confirmed', Pass::min(8)->mixedCase()->numbers()->symbols()],
+            ]);
+        } catch ( \Throwable $th ) {
+
+            return response([
+                "status" => 422,
+                "message" => $th->getMessage()
+            ], 422);
+
+        }
         
+        // Locate the user by email.
+        $user = User::where('email', $request->email)->first();
+
+        if (!$user) {
+            return response([
+                "status" => 404,
+                "message" => "No se encontró un usuario con ese email."
+            ], 404);
+        }
+    
+        // Change the password.
+        try {
+            $user->password = Hash::make($request->password);
+    
+            $user->save();
+
+            return response([
+                "status" => 200,
+                "message" => "La contraseña ha sido cambiada."
+            ], 200);
+        } catch ( \Throwable $th ) {
+            return response([
+                "status" => 500,
+                "message" => $th->getMessage()
+            ], 500);
+        }
 
     }
 
