@@ -77,4 +77,79 @@ class EcwidUserController extends Controller
         }
 
     }
+
+    // Update user.
+    public static function update( $customerId, $name, $email, $phone ) {
+
+        if ( validEcwidConfig()["status"] === true ) {
+
+            $response = Http::withHeaders([
+                'method' => 'POST',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => ( env('ECWID_API_SECRET_TOKEN') ) ? env('ECWID_API_SECRET_TOKEN') : env('ECWID_API_PUBLIC_TOKEN')
+            ])->put( env('ECWID_API_BASE_URL') . env('ECWID_STORE_ID') . "/customers/" . $customerId, [
+                "email" => $email,
+                "billingPerson" => [
+                    "name" => $name,
+                    "phone" => $phone,
+                ],
+            ] );
+
+            if ( $response->successful() ) {
+                return $response->json();
+            }
+
+            return $response;
+
+        }
+
+    }
+
+    // Change password (Update function can't handle it since the stored password is encrypted).
+    public static function updatePassword( $customerId, $password ) {
+
+        if ( validEcwidConfig()["status"] === true ) {
+
+            $response = Http::withHeaders([
+                'method' => 'PUT',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => ( env('ECWID_API_SECRET_TOKEN') ) ? env('ECWID_API_SECRET_TOKEN') : env('ECWID_API_PUBLIC_TOKEN')
+            ])->put( env('ECWID_API_BASE_URL') . env('ECWID_STORE_ID') . "/customers/" . $customerId, [
+                "password" => $password,
+            ] );
+
+            if ( $response->successful() ) {
+                return $response->json();
+            }
+
+            return $response;
+
+        }
+
+    }
+
+    // Delete user.
+    public static function delete( $customerId ) {
+
+        if ( validEcwidConfig()["status"] === true ) {
+
+            $response = Http::withHeaders([
+                'method' => 'DELETE',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => ( env('ECWID_API_SECRET_TOKEN') ) ? env('ECWID_API_SECRET_TOKEN') : env('ECWID_API_PUBLIC_TOKEN')
+            ])->delete( env('ECWID_API_BASE_URL') . env('ECWID_STORE_ID') . "/customers/" . $customerId );
+
+            if ( $response->successful() ) {
+                return $response->json();
+            }
+
+            return $response;
+
+        }
+
+    }
+
 }

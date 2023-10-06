@@ -27,7 +27,7 @@ class AuthController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
-            'type' => 'required|string'
+            'type' => 'in:Arquitecto,Interiorista,Otro'
         ]);
 
         /**
@@ -35,9 +35,7 @@ class AuthController extends Controller
          * Acquires the user from ECWID or creates it if it doesn't exist.
          * Requires: all ECWID env variables to be set through the validEcwidConfig helper method used in EcwidUserController
          */
-         $ecwidUser = EcwidUserController::get( $fields['email'] );
-
-         
+         $ecwidUser = EcwidUserController::get( $fields['email'] );         
 
         // If the user's email exists on Ecwid, get user's data
         if ( $ecwidUser && $ecwidUser["status"] === 200 ) {
@@ -114,6 +112,117 @@ class AuthController extends Controller
     }
 
     /**
+     * Update user profile (Name, email(disabled) phone, type)
+     */
+    public function updateUser( Request $request ) {
+
+        // Validate request data
+        try {
+            $fields = $request->validate([
+                'name' => 'string',
+                'email' => 'email',
+                'type' => 'in:Arquitecto,Interiorista,Otro',
+                'phone' => 'string',
+            ]);
+        } catch ( \Throwable $th ) {
+            return response([
+                "status" => 422,
+                "message" => $th->getMessage()
+            ], 422);
+        }
+
+        // Locate the user by the email.
+        $user = User::where('email', $fields['email'])->first();
+
+        if (!$user) {
+            return response([
+                "status" => 404,
+                "message" => "No se encontró un usuario con ese email."
+            ], 404);
+        }
+
+        // Update all the fields on ECWID
+        $ecwidResponse = EcwidUserController::update( $user->ecwidUserId, $fields["name"], $fields["email"], $fields["phone"] );
+        // return $ecwidResponse;
+        if ( $ecwidResponse["updateCount"] !== 1 ) {
+            return response([
+                "status" => 502,
+                "message" => "Error actualizando al usuario en la plataforma. No se guardaron cambios."
+            ], 502);
+        }
+
+        // Update all the fields on local database
+        try {
+            $user->name = $fields['name'] ? $fields['name'] : $user->name;
+            $user->email = $fields['email'] ? $fields['email'] : $user->email;
+            $user->type = $fields['type'] ? $fields['type'] : $user->type;
+            $user->phone = $fields['phone'] ? $fields['phone'] : $user->phone;
+            $user->save();
+
+            return response([
+                "status" => 200,
+                "message" => "Los cambios al usuario han sido aplicados."
+            ], 200);
+        } catch ( \Throwable $th ) {
+            return response([
+                "status" => 500,
+                "message" => $th->getMessage()
+            ], 500);
+        }
+
+    }
+
+    /**
+     * Delete user.
+     */
+    public function deleteUser( Request $request ) {
+        
+        $request->validate([
+            'email' => 'required|email',
+        ]);
+
+        // Select the user
+        try {
+            $user = User::where('email', $request->email)->first();
+        } catch (\Throwable $th) {
+            return response([
+                "status" => 404,
+                "message" => $th->getMessage()
+            ], 404);
+        }
+
+        // Delete the user from ECWID
+        $ecwidResponse = EcwidUserController::delete( $user->ecwidUserId );
+
+        if ( $ecwidResponse["deleteCount"] !== 1 ) {
+            return response([
+                "status" => 502,
+                "message" => "Error al intentar eliminar al usuario en la plataforma."
+            ], 502);
+        }
+
+        // Delete current token (logging user out)
+        $request->user()->currentAccessToken()->delete();
+
+        // Delete the user from the local database.
+        try {
+            $user->delete();
+
+            return response([
+                "status" => 200,
+                "message" => "El usuario y los datos ligados han sido eliminados del sistema."
+            ]);
+
+        } catch (\Throwable $th) {
+            return response([
+                "status" => 500,
+                "message" => $th->getMessage()
+            ], 500);
+        }
+
+    }
+
+    /**
      * Login function
      */
     public function login( Request $request ) {
@@ -170,9 +279,10 @@ class AuthController extends Controller
 
         $request->user()->currentAccessToken()->delete();
 
-        return [
-            'message' => 'Logged out.'
-        ];
+        return response([
+            'status' => 200,
+            'message' => 'Sesión cerrada.'
+        ], 200);
     }
 
     /**
@@ -249,11 +359,24 @@ class AuthController extends Controller
      */
     public function processPasswordReset( Request $request ) {
 
-        $request->validate([
+        $fields = $request->validate([
             'token' => 'required',
             'email' => 'required|email',
             'password' => ['required', 'confirmed', Pass::min(8)->mixedCase()->numbers()->symbols()],
         ]);
+
+        // Locate the user by email.
+        $user = User::where('email', $request->email)->first();
+
+        // Change the password on ECWID platform. (UNTESTED)
+        $ecwidResponse = EcwidUserController::updatePassword( $user->ecwidUserId, $fields['password'] );
+        // return $ecwidResponse;
+        if ( $ecwidResponse["updateCount"] !== 1 ) {
+            return response([
+                "status" => 502,
+                "message" => "Error cambiando la contraseña en la plataforma. No se guardaron cambios."
+            ], 502);
+        }
 
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
@@ -289,7 +412,7 @@ class AuthController extends Controller
 
         // Validate request inputs.
         try {
-            $request->validate([
+            $fields = $request->validate([
                 'email' => 'required|email',
                 'password' => ['required', 'confirmed', Pass::min(8)->mixedCase()->numbers()->symbols()],
             ]);
@@ -310,6 +433,16 @@ class AuthController extends Controller
                 "status" => 404,
                 "message" => "No se encontró un usuario con ese email."
             ], 404);
+        }
+
+        // Change the password on ECWID platform. (UNTESTED)
+        $ecwidResponse = EcwidUserController::updatePassword( $user->ecwidUserId, $fields['password'] );
+        // return $ecwidResponse;
+        if ( $ecwidResponse["updateCount"] !== 1 ) {
+            return response([
+                "status" => 502,
+                "message" => "Error cambiando la contraseña en la plataforma. No se guardaron cambios."
+            ], 502);
         }
     
         // Change the password.
@@ -332,3 +465,4 @@ class AuthController extends Controller
     }
 
 }
+
