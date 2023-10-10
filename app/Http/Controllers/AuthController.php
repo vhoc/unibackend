@@ -35,74 +35,99 @@ class AuthController extends Controller
          * Acquires the user from ECWID or creates it if it doesn't exist.
          * Requires: all ECWID env variables to be set through the validEcwidConfig helper method used in EcwidUserController
          */
-         $ecwidUser = EcwidUserController::get( $fields['email'] );         
+        if( env('PLATFORM') === "ecwid" ) {
 
-        // If the user's email exists on Ecwid, get user's data
-        if ( $ecwidUser && $ecwidUser["status"] === 200 ) {
+            $ecwidUser = EcwidUserController::get( $fields['email'] );         
+
+            // If the user's email exists on Ecwid, get user's data
+            if ( $ecwidUser && $ecwidUser["status"] === 200 ) {
+                
+                $newUser = [
+                    'name' => $fields['name'],
+                    'email' => $fields['email'],
+                    'password' => bcrypt( $fields['password'] ),
+                    'ecwidUserId' => $ecwidUser["user"]["id"],
+                    'type' => $request->type,
+                    'phone' => $ecwidUser["user"]["billingPerson"]["phone"] ? $ecwidUser["user"]["billingPerson"]["phone"] : $ecwidUser["user"]["shippingAddresses"][0]["phone"],
+                ];
+
+                // If ECWID user was successfully acquired, save the user in the local database.
+                if ( $newUser['ecwidUserId'] ) {
+
+                    // Create local user
+                    $user = User::create($newUser);
+                    
+                    // Send verification email.
+                    event(new Registered($user));
+
+                    // Generate and send response with created local user.
+                    $response = [
+                        'user' => $user,
+                    ];
+
+                    // Return a sucess response.
+                    return response( $response, 201 );
+
+                }
+            }
             
+            // If the user doesnt exist on Ecwid API:
+            // Create customer on Ecwid, with tier (customer group) 0
+            $newEcwidUser = EcwidUserController::create( $fields['email'], $fields['password'], 0, ["name" => $fields['name']] );
+
+            if ( $newEcwidUser ) {
+                
+                $newUser = [
+                    'name' => $fields['name'],
+                    'email' => $fields['email'],
+                    'password' => bcrypt( $fields['password'] ),
+                    'ecwidUserId' => $newEcwidUser["id"], 
+                    'type' => $request->type,
+                ];
+
+                // If ECWID user was successfully created, save the user in the local database.
+                if ( $newUser['ecwidUserId'] ) {
+
+                    // Create local user
+                    $user = User::create($newUser);
+                    
+                    // Send verification email.
+                    event(new Registered($user));
+
+                    // Generate and send response with created local user.
+                    $response = [
+                        'user' => $user,
+                    ];
+
+                    // Return a sucess response.
+                    return response( $response, 201 );
+
+                }
+
+            }
+
+        } else {// NO ECWID
             $newUser = [
                 'name' => $fields['name'],
                 'email' => $fields['email'],
                 'password' => bcrypt( $fields['password'] ),
-                'ecwidUserId' => $ecwidUser["user"]["id"],
-                'type' => $request->type,
-                'phone' => $ecwidUser["user"]["billingPerson"]["phone"] ? $ecwidUser["user"]["billingPerson"]["phone"] : $ecwidUser["user"]["shippingAddresses"][0]["phone"],
             ];
 
-            // If ECWID user was successfully acquired, save the user in the local database.
-            if ( $newUser['ecwidUserId'] ) {
+            // Create local user
+            $user = User::create($newUser);
+                    
+            // Send verification email.
+            event(new Registered($user));
 
-                // Create local user
-                $user = User::create($newUser);
-                
-                // Send verification email.
-                event(new Registered($user));
+            // Generate and send response with created local user.
+            $response = [
+                'user' => $user,
+            ];
 
-                // Generate and send response with created local user.
-                $response = [
-                    'user' => $user,
-                ];
-
-                // Return a sucess response.
-                return response( $response, 201 );
-
-            }
+            // Return a sucess response.
+            return response( $response, 201 );
         }
         
-        // If the user doesnt exist on Ecwid API:
-        // Create customer on Ecwid, with tier (customer group) 0
-        $newEcwidUser = EcwidUserController::create( $fields['email'], $fields['password'], 0, ["name" => $fields['name']] );
-
-        if ( $newEcwidUser ) {
-            
-            $newUser = [
-                'name' => $fields['name'],
-                'email' => $fields['email'],
-                'password' => bcrypt( $fields['password'] ),
-                'ecwidUserId' => $newEcwidUser["id"], 
-                'type' => $request->type,
-            ];
-
-            // If ECWID user was successfully created, save the user in the local database.
-            if ( $newUser['ecwidUserId'] ) {
-
-                // Create local user
-                $user = User::create($newUser);
-                
-                // Send verification email.
-                event(new Registered($user));
-
-                // Generate and send response with created local user.
-                $response = [
-                    'user' => $user,
-                ];
-
-                // Return a sucess response.
-                return response( $response, 201 );
-
-            }
-
-        }
 
         return response( [
             "status" => 500,
