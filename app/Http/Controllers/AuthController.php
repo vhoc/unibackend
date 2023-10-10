@@ -37,7 +37,8 @@ class AuthController extends Controller
          */
         if( env('PLATFORM') === "ecwid" ) {
 
-            $ecwidUser = EcwidUserController::get( $fields['email'] );         
+            $ecwidUser = EcwidUserController::get( $fields['email'] );
+            return $ecwidUser;
 
             // If the user's email exists on Ecwid, get user's data
             if ( $ecwidUser && $ecwidUser["status"] === 200 ) {
