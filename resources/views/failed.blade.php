@@ -7,7 +7,7 @@
     <!-- Forcing initial-scale shouldn't be necessary -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- Use the latest (edge) version of IE rendering engine -->
-    <title>default</title>
+    <title>Error</title>
     <!-- The title tag shows in email notifications, like Android 4.4. -->
     <!-- Please use an inliner tool to convert all CSS to inline as inpage or external CSS is removed by email clients -->
     <!-- important in CSS is used to prevent the styles of currently inline CSS from overriding the ones mentioned in media queries when corresponding screen sizes are encountered -->
@@ -153,14 +153,14 @@ a[x-apple-data-detectors] {
                     <tr>
                     <td width="50%" class="stack-column-center" valign="top"><table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" >
                         <tr>
-                        <td dir="ltr" valign="top" style="padding: 0 10px;"><img src="{{ URL::asset('images/Idelika-logo.svg') }}"  width="90" alt="alt_text" border="0" class="center-on-narrow"></td>
+                        <td dir="ltr" valign="top" style="padding: 0 10px;"><img src="{{ env("APP_LOGO_URL") }}"  alt="alt_text" border="0" class="center-on-narrow"></td>
                       </tr>
                       </table>
 					</td>
                     
 					<td width="50%" class="stack-column-center"><table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
                         <tr>
-                        <td dir="ltr" valign="top" style="font-family: sans-serif; font-size: 16px; font-weight: bold; mso-height-rule: exactly; color: #F88A6F; padding: 10px; text-align: right;" class="center-on-narrow">ACTIVACIÓN EXPIRADA
+                        <td dir="ltr" valign="top" style="font-family: sans-serif; font-size: 16px; font-weight: bold; mso-height-rule: exactly; color: {{ env('PRIMARY_COLOR') }}; padding: 10px; text-align: right;" class="center-on-narrow">ACTIVACIÓN EXPIRADA
                         </td>
                       </tr>
                       </table>
@@ -176,19 +176,19 @@ a[x-apple-data-detectors] {
             <!-- 1 Column Text : Intro -->
             <tr>
                 <td style="padding: 30px; text-align: left; font-family: sans-serif; font-size: 14px; mso-height-rule: exactly; line-height: 28px; color: #555555;">
-					Hola {{ $name }},<br><br>
-						<strong>La activación de tu cuenta ha expirado o ya fue activada anteriormente</strong>. Si no has activado tu cuenta, es necesario que realices el registro de nuevo en la applicación. 
+					Hola,<br><br>
+						<strong>La activación de tu cuenta ha expirado o ya fue activada anteriormente</strong>. Si no has activado tu cuenta, es necesario que realices el registro de nuevo en la aplicación. 
 					<br><br>
 					<br>
 					Esperamos verte pronto en:
 					<br>
-					<span style="font-weight: bold; color: #F88A6F;">Idelika Partner</span>
+					<span style="font-weight: bold; color: {{ env("PRIMARY_COLOR") }};">{{ env("APP_NAME") }}</span>
 				</td>
 			</tr>
 			<tr>
 				<td style="padding: 30px; text-align: center; font-family: sans-serif; font-size: 14px; mso-height-rule: exactly; line-height: 28px; color: #555555;">
 					<span style="text-align: center; align-content: center"><strong>Estamos para ayudarte</strong><br>
-					Si tienes dudas o comentarios acerca de la aplicación, envianos un correo a <a href="mailto:contacto@idelika.com" style="text-decoration-color: #F88A6F; color: #F1866D">contacto@idelika.com</a>.</span>
+					Si tienes dudas o comentarios acerca de la aplicación, envianos un correo a <a href="mailto:{{ env('SUPPORT_MAIL_ADDRESS') }}" style="text-decoration-color: {{ env("PRIMARY_COLOR") }}; color: {{ env("PRIMARY_COLOR") }}">{{ env('SUPPORT_MAIL_ADDRESS') }}</a>.</span>
 				</td>
             </tr>
           	<!-- 1 Column Text : Intro -->

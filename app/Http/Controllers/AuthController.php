@@ -27,7 +27,8 @@ class AuthController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
-            'type' => 'in:Arquitecto,Interiorista,Otro'
+            'type' => 'in:Arquitecto,Interiorista,Otro',
+            'phone' => 'string'
         ]);
 
         /**
@@ -38,7 +39,16 @@ class AuthController extends Controller
         if( env('PLATFORM') === "ecwid" ) {
 
             $ecwidUser = EcwidUserController::get( $fields['email'] );
-            return $ecwidUser;
+            
+            if( $ecwidUser['status'] === 500 ) {
+                return response([
+                    "status" => 500,
+                    "remote_status" => $ecwidUser['remote_status'],
+                    "remote_body" => $ecwidUser["remote_body"],
+                    // "message" => "No fue posible conectar a la plataforma remota. Verifique tokens de acceso."
+                    "message" => $ecwidUser['message'],
+                ], 500);
+            }
 
             // If the user's email exists on Ecwid, get user's data
             if ( $ecwidUser && $ecwidUser["status"] === 200 ) {
@@ -72,9 +82,10 @@ class AuthController extends Controller
                 }
             }
             
+            
             // If the user doesnt exist on Ecwid API:
             // Create customer on Ecwid, with tier (customer group) 0
-            $newEcwidUser = EcwidUserController::create( $fields['email'], $fields['password'], 0, ["name" => $fields['name']] );
+            $newEcwidUser = EcwidUserController::create( $fields['email'], $fields['password'], 0, ["name" => $fields['name'], "phone" => $fields['phone']] );
 
             if ( $newEcwidUser ) {
                 
@@ -84,6 +95,7 @@ class AuthController extends Controller
                     'password' => bcrypt( $fields['password'] ),
                     'ecwidUserId' => $newEcwidUser["id"], 
                     'type' => $request->type,
+                    'phone' => $fields['phone'],
                 ];
 
                 // If ECWID user was successfully created, save the user in the local database.
@@ -93,7 +105,19 @@ class AuthController extends Controller
                     $user = User::create($newUser);
                     
                     // Send verification email.
-                    event(new Registered($user));
+                    try {
+                        event(new Registered($user));
+                    } catch (\Throwable $e) {
+                        // If verification mail send fails, delete user from ecwid and local database.
+                        EcwidUserController::delete( $newUser['ecwidUserId'] );
+                        $user->delete();
+
+                        return response( [
+                            "status" => 500,
+                            "message" => $e->getMessage(),
+                        ], 500 );
+                    }
+                    
 
                     // Generate and send response with created local user.
                     $response = [
@@ -349,6 +373,7 @@ class AuthController extends Controller
         $user->sendEmailVerificationNotification();
 
         $response = [
+            'status' => 200,
             'message' => 'Verification link sent!',
         ];
 
@@ -418,16 +443,10 @@ class AuthController extends Controller
         );
 
         if ( $status === Password::PASSWORD_RESET ) {
-            return response( [
-                "status" => 200,
-                "message" => "La nueva contraseña fue establecida con éxito.",
-            ], 200 );
+            return view('passwordResetSuccess');
         }
 
-        return response( [
-            "status" => 422,
-            "message" => "El enlace ha expirado o ya fue utilizado",
-        ], 422 );
+        return view('passwordResetFailed');
 
     }
 

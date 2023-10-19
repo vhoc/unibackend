@@ -7,13 +7,9 @@
 
 <tr><td>&nbsp;</td></tr>
 
-<tr><td><span style="color: #ec795c; font-weight: bold;">Idelika Partner</span></td></tr>
-
-<tr><td>&nbsp;</td></tr>
-
 <tr>
 <td>
-Revisa las <a href="https://idelika.com/politicas-de-privacidad" >politicas de privacidad</a>. Idelika derechos reservados, 2022.
+Revisa las <a href="{{ env("PRIVACY_POLICY_URL") }}" >politicas de privacidad</a>. {{ env("APP_NAME") }} derechos reservados, 2022.
 </td>
 </tr>
 </table>

@@ -41,3 +41,11 @@ Route::get('/forgot-password', function ( Request $request ) {
     // ];
 
 })->name('password.redirect');
+
+// Route::get('/forgot-password/success', function () {
+//     return view('reset-password-success');
+// })->name('passwordReset.success');
+
+// Route::get('/forgot-password/success', function () {
+//     return view('reset-password-failed');
+// })->name('passwordReset.success');

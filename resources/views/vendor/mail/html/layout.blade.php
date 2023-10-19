@@ -39,9 +39,9 @@ width: 100% !important;
 <!-- Body content -->
 <tr>
     <td class="header">
-        <img src="https://idelika.xneighbor.com/idelika-logo.png" width="140" height="40" class="logo" alt="Logo">
+        <!--<img src="https://idelika.xneighbor.com/idelika-logo.png" width="140" height="40" class="logo" alt="Logo">-->
     </td>
-    <td dir="ltr" valign="top" style="text-size-adjust: 100%; box-sizing: border-box; position: relative; font-family: sans-serif; font-size: 14px; font-weight: bold; color: rgb(248, 138, 111); padding: 10px; text-align: right;">
+    <td dir="ltr" valign="top" style="text-size-adjust: 100%; box-sizing: border-box; position: relative; font-family: sans-serif; font-size: 14px; font-weight: bold; padding: 10px; text-align: right;">
         {{ $actionText ?? '' }}
     </td>
 </tr>

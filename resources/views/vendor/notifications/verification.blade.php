@@ -191,7 +191,7 @@ a[x-apple-data-detectors] {
 			</tr>
             <tr>
                 <td style="padding: 0px 20px 20px 20px; text-align: left; font-family: sans-serif; font-size: 14px; mso-height-rule: exactly; line-height: 28px; color: #000; text-align: left; letter-spacing: .2px;">
-                    <p>Has recibido este correo porque intentaste crear una cuenta en Idelika Partner. Para activar tu cuenta presiona el siguiente botón.</p>
+                    <p>Has recibido este correo porque intentaste crear una cuenta en EcwidStore. Para activar tu cuenta presiona el siguiente botón.</p>
 				</td>
             </tr>
             <tr>
@@ -211,9 +211,9 @@ a[x-apple-data-detectors] {
             </tr>
             <tr>
                 <td style="padding: 0px 20px 20px 20px; text-align: left; font-family: sans-serif; font-size: 12px; mso-height-rule: exactly; line-height: 18px; color: #909090; text-align: left;">
-                    <p>Si el botón no funciona por favor envía un correo a <a href="mailto:soporte-app@idelika.com" style="text-decoration: none; color: #cc6348;">soporte-app@idelika.com</a> para brindarte apoyo.</p>
-                    <p style=" padding-top: 20px;"><span style="color:#f88a6f; font-size: 14px; font-weight: bold;">Idelika Partner</span></p>
-                    <p style="padding-top: 20px;">Revisa las <a href="https://idelika.com/politicas-de-privacidad" style="text-decoration: none; color: #cc6348;">politicas de privacidad</a>. Idelika derechos reservados, 2022.</p>
+                    <p>Si el botón no funciona por favor envía un correo a <a href="mailto:soporte-app@idelika.com" style="text-decoration: none; color: #cc6348;">soporte-app@EcwidStore.com</a> para brindarte apoyo.</p>
+                    <p style=" padding-top: 20px;"><span style="color:#f88a6f; font-size: 14px; font-weight: bold;">EcwidStore</span></p>
+                    <p style="padding-top: 20px;">Revisa las <a href="https://EcwidStore.com/politicas-de-privacidad" style="text-decoration: none; color: #cc6348;">politicas de privacidad</a>. EcwidStore derechos reservados, 2024.</p>
 				</td>
             </tr>  
           </td>

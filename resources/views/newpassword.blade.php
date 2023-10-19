@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>New Password</title>
+    <title>Nueva Contraseña</title>
     <style>
         /* Initial settings, Globals and Variables */
         * {
@@ -44,13 +44,13 @@
 
             @method('PUT')
 
-            <div class="text-center font-bold py-4 text-orange-400">
+            <div class="text-center font-bold py-4" style="color: {{ env('PRIMARY_COLOR') }}">
                 Elige tu nueva contraseña
             </div>
 
             <div class="flex flex-col">
                 <label for="password" class="text-gray-500">Nueva contraseña</label>
-                <input id="password" type="password" name="password" class="@error('password') is-invalid @enderror border rounded text-lg text-orange-400 p-1 focus:outline-orange-400" />
+                <input id="password" type="password" name="password" class="@error('password') is-invalid @enderror border rounded text-lg p-1 focus:outline-{{ env("TAILWIND_PRIMARY_COLOR_CLASS") }}" />
                 @error('password')
                 <div class="text-xs text-red-600">{{ $message }}</div>
                 @enderror
@@ -58,7 +58,7 @@
             
             <div class="flex flex-col">
                 <label for="password_confirmation" class="text-gray-500">Confirmar nueva contraseña</label>
-                <input id="password_confirmation" type="password" name="password_confirmation" class="@error('password_confirmation') is-invalid @enderror border rounded text-lg text-orange-400 p-1 focus:outline-orange-400" />
+                <input id="password_confirmation" type="password" name="password_confirmation" class="@error('password_confirmation') is-invalid @enderror border rounded text-lg p-1 focus:outline-{{ env("TAILWIND_PRIMARY_COLOR_CLASS") }}" />
                 @error('password_confirmation')
                 <div class="text-xs text-red-600">{{ $message }}</div>
                 @enderror
@@ -67,7 +67,7 @@
             <input type="hidden" value="{{$token}}" name="token" />
             <input type="hidden" value="{{$email}}" name="email" />
 
-            <button type="submit" class="mt-3 rounded p-2 bg-orange-400 text-white font-bold">
+            <button type="submit" class="mt-3 rounded p-2 bg-{{ env("TAILWIND_PRIMARY_COLOR_CLASS") }} text-white font-bold">
                 Guardar cambios
             </button>
             

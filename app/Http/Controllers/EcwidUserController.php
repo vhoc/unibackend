@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use Illuminate\Http\Request;
+// use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class EcwidUserController extends Controller
@@ -11,7 +11,9 @@ class EcwidUserController extends Controller
     // Get one user.
     public static function get( $email ) {
 
-        if ( validEcwidConfig()["status"] === true ) {
+        $validEcwidConfig = validEcwidConfig();
+
+        if ( $validEcwidConfig["status"] === true ) {
 
             $response = Http::withHeaders([
                 'Accept' => 'application/json',
@@ -39,11 +41,23 @@ class EcwidUserController extends Controller
     
             }
 
+            if ( $response->failed() ) {
+                return [
+                    "status" => 500,
+                    "remote_status" => $response->status(),
+                    "remote_body" => $response->json(),
+                    "message" => $response->reason(),
+                ];
+            }
+
+            
+            // return $response;
+
         }
 
         return [
             "status" => 400,
-            "message" => validEcwidConfig()["message"]
+            "message" => $validEcwidConfig["message"]
         ];
 
     }

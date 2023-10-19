@@ -53,7 +53,7 @@
         'actionText' => $actionText,
     ]
 ) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span><br/>
-<span>O envía un correo a <a href="mailto:soporte-app@idelika.com" target="_blank">soporte-app@idelika.com</a> para brindarte apoyo</span>
+<p>O envía un correo a <a href="mailto:{{ env("SUPPORT_MAIL_ADDRESS") }}" target="_blank">{{ env("SUPPORT_MAIL_ADDRESS") }}</a> para brindarte apoyo</p>
 </x-slot:subcopy>
 @endisset
 </x-mail::message>

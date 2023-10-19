@@ -3,7 +3,12 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\EcwidCategoryController;
+use App\Http\Controllers\EcwidOrderController;
+use App\Http\Controllers\EcwidProductCombinationController;
+use App\Http\Controllers\EcwidProductController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
+use App\Http\Controllers\MlaUserController;
 
 /*
 |--------------------------------------------------------------------------
@@ -62,6 +67,23 @@ Route::get('forgot-password', function ( Request $request ) {
 
 Route::put('forgot-password', [AuthController::class, 'processPasswordReset'])->name('password.processReset');
 
+// CATEGORIES
+
+Route::get('categories', [EcwidCategoryController::class, 'getAll'])->name('categories.getAll');
+Route::get('categories/{categoryId}', [EcwidCategoryController::class, 'getOne'])->name('categories.getOne');
+
+// PRODUCTS
+
+Route::get('products/{productId}', [EcwidProductController::class, 'getOne'])->name('product.getOne');
+Route::get('products', [EcwidProductController::class, 'search'])->name('products.search');
+
+// PRODUCT COMBINATIONS
+
+Route::get('products/{productId}/combinations', [EcwidProductCombinationController::class, 'getCombinations'])->name('product.getCombinations');
+
+// ORDER
+
+Route::post('order/calculate', [EcwidOrderController::class, 'calculate'])->name('order.calculate');
 
 
 /*
@@ -88,3 +110,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/user', [AuthController::class, 'deleteUser']);
 
 });
+
+
+/*
+|--------------------------------------------------------------------------
+| MLA :: PUBLIC ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::post('/mla/user/register', [MlaUserController::class, 'register']);

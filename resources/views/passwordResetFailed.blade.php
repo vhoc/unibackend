@@ -7,7 +7,7 @@
     <!-- Forcing initial-scale shouldn't be necessary -->
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <!-- Use the latest (edge) version of IE rendering engine -->
-    <title>Cuenta Activada</title>
+    <title>Error</title>
     <!-- The title tag shows in email notifications, like Android 4.4. -->
     <!-- Please use an inliner tool to convert all CSS to inline as inpage or external CSS is removed by email clients -->
     <!-- important in CSS is used to prevent the styles of currently inline CSS from overriding the ones mentioned in media queries when corresponding screen sizes are encountered -->
@@ -143,7 +143,7 @@ a[x-apple-data-detectors] {
         <td><center style="width: 100%;">
             
             <!-- Visually Hidden Preheader Text : BEGIN -->
-            <div style="display:none;font-size:1px;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;font-family: sans-serif;"> Activa tu cuenta en Idelika Partner </div>
+            <div style="display:none;font-size:1px;line-height:1px;max-height:0px;max-width:0px;opacity:0;overflow:hidden;mso-hide:all;font-family: sans-serif;">  </div>
             <!-- Visually Hidden Preheader Text : END -->
           <!-- Email Header : BEGIN -->
           <table align="center" width="600" class="email-container" style="background-color: #ffffff;">
@@ -160,7 +160,7 @@ a[x-apple-data-detectors] {
                     
 					<td width="50%" class="stack-column-center"><table align="center" border="0" cellpadding="0" cellspacing="0" width="100%">
                         <tr>
-                        <td dir="ltr" valign="top" style="font-family: sans-serif; font-size: 16px; font-weight: bold; mso-height-rule: exactly; color: {{ env("PRIMARY_COLOR") }}; padding: 10px; text-align: right;" class="center-on-narrow">CUENTA ACTIVADA
+                        <td dir="ltr" valign="top" style="font-family: sans-serif; font-size: 16px; font-weight: bold; mso-height-rule: exactly; color: {{ env("PRIMARY_COLOR") }}; padding: 10px; text-align: right;" class="center-on-narrow">ERROR
                         </td>
                       </tr>
                       </table>
@@ -176,13 +176,9 @@ a[x-apple-data-detectors] {
             <!-- 1 Column Text : Intro -->
             <tr>
                 <td style="padding: 30px; text-align: left; font-family: sans-serif; font-size: 14px; mso-height-rule: exactly; line-height: 28px; color: #555555;">
-					Hola {{ $name }},<br><br>
-						<strong>Tu cuenta ha sido activada satisfactoriamente</strong>. Ya puedes iniciar sesión en la app de {{ env("APP_NAME") }}. 
+					Hola,<br><br>
+						<strong>Tu contraseña no pudo ser restablecida</strong>. Probablemente se deba a que el enlace expiró, o ya fue utilizado anteriormente. Intenta iniciar de nuevo el proceso de restablecimiento desde la App. Si el problema persiste, puedes contactarnos al correo de abajo para dar seguimiento al problema.
 					<br><br>
-					<br>
-					No esperes más para realizar tu primer compra en:
-					<br>
-					<span style="font-weight: bold; color: {{ env("PRIMARY_COLOR") }};">{{ env("APP_NAME") }}</span>
 				</td>
 			</tr>
 			<tr>
