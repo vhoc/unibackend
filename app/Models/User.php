@@ -9,6 +9,7 @@ use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use App\Models\MlaContactMethod;
+use App\Models\MlaProduct;
 
 
 class User extends Authenticatable implements MustVerifyEmail
@@ -55,5 +56,13 @@ class User extends Authenticatable implements MustVerifyEmail
     public function mla_contact_methods(): HasMany
     {
         return $this->hasMany(MlaContactMethod::class);
+    }
+
+    /**
+     * Get the user's products
+     */
+    public function mla_products(): HasMany
+    {
+        return $this->hasMany(MlaProduct::class);
     }
 }

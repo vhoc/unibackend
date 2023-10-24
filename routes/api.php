@@ -7,8 +7,12 @@ use App\Http\Controllers\EcwidCategoryController;
 use App\Http\Controllers\EcwidOrderController;
 use App\Http\Controllers\EcwidProductCombinationController;
 use App\Http\Controllers\EcwidProductController;
+use App\Http\Controllers\EcwidUserController;
+use App\Http\Controllers\MlaImageController;
+use App\Http\Controllers\MlaProductController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\MlaUserController;
+use App\Models\MlaProduct;
 
 /*
 |--------------------------------------------------------------------------
@@ -67,6 +71,11 @@ Route::get('forgot-password', function ( Request $request ) {
 
 Route::put('forgot-password', [AuthController::class, 'processPasswordReset'])->name('password.processReset');
 
+// ECWID USER
+
+// Get user
+Route::get('ecwid/customers/{ecwidUserId}', [EcwidUserController::class, 'getById'])-> name('ecwidUser.get');
+
 // CATEGORIES
 
 Route::get('categories', [EcwidCategoryController::class, 'getAll'])->name('categories.getAll');
@@ -83,7 +92,8 @@ Route::get('products/{productId}/combinations', [EcwidProductCombinationControll
 
 // ORDER
 
-Route::post('order/calculate', [EcwidOrderController::class, 'calculate'])->name('order.calculate');
+// Calculate
+Route::post('ecwid/order/calculate', [EcwidOrderController::class, 'calculate'])->name('order.calculate');
 
 
 /*
@@ -109,6 +119,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Delete user
     Route::delete('/user', [AuthController::class, 'deleteUser']);
 
+    // ECWID USER
+
+    // Shipping Address update
+    Route::put('ecwid/customers/{ecwidUserId}', [EcwidUserController::class, 'updateShippingAddress']);
+
+    
+
 });
 
 
@@ -118,3 +135,24 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 |--------------------------------------------------------------------------
 */
 Route::post('/mla/user/register', [MlaUserController::class, 'register']);
+
+// Products
+Route::get('/mla/user/{userId}/products', [MlaProductController::class, 'index']);
+Route::get('/mla/products/{productId}', [MlaProductController::class, 'show']);
+
+/*
+|--------------------------------------------------------------------------
+| MLA :: PROTECTED ROUTES
+|--------------------------------------------------------------------------
+*/
+Route::group(['middleware' => ['auth:sanctum']], function () {
+
+    // Products
+    Route::post('/mla/products', [MlaProductController::class, 'store']);
+    Route::put('/mla/products/{productId}', [MlaProductController::class, 'update']);
+    Route::delete('mla/products/{productId}', [MlaProductController::class, 'destroy']);
+
+    // Image Files
+    Route::post('/mla/images', [MlaImageController::class, 'store']);
+
+});

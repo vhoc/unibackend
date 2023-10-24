@@ -171,7 +171,7 @@ class AuthController extends Controller
             $fields = $request->validate([
                 'name' => 'string',
                 'email' => 'email',
-                'type' => 'in:Arquitecto,Interiorista,Otro',
+                // 'type' => 'in:Arquitecto,Interiorista,Otro',
                 'phone' => 'string',
             ]);
         } catch ( \Throwable $th ) {
@@ -203,9 +203,9 @@ class AuthController extends Controller
 
         // Update all the fields on local database
         try {
-            $user->name = $fields['name'] ? $fields['name'] : $user->name;
+            $user->name = $fields['name'];
             $user->email = $fields['email'] ? $fields['email'] : $user->email;
-            $user->type = $fields['type'] ? $fields['type'] : $user->type;
+            // $user->type = $fields['type'] ? $fields['type'] : "Otro";
             $user->phone = $fields['phone'] ? $fields['phone'] : $user->phone;
             $user->save();
 
@@ -419,15 +419,21 @@ class AuthController extends Controller
         // Locate the user by email.
         $user = User::where('email', $request->email)->first();
 
-        // Change the password on ECWID platform. (UNTESTED)
-        $ecwidResponse = EcwidUserController::updatePassword( $user->ecwidUserId, $fields['password'] );
-        // return $ecwidResponse;
-        if ( $ecwidResponse["updateCount"] !== 1 ) {
-            return response([
-                "status" => 502,
-                "message" => "Error cambiando la contraseña en la plataforma. No se guardaron cambios."
-            ], 502);
+        if ( env("PLATFORM") === "ecwid" ) {
+
+            // Change the password on ECWID platform. (UNTESTED)
+            $ecwidResponse = EcwidUserController::updatePassword( $user->ecwidUserId, $fields['password'] );
+            // return $ecwidResponse;
+            if ( $ecwidResponse["updateCount"] !== 1 ) {
+                return response([
+                    "status" => 502,
+                    "message" => "Error cambiando la contraseña en la plataforma. No se guardaron cambios."
+                ], 502);
+            }
+
         }
+
+        
 
         $status = Password::reset(
             $request->only('email', 'password', 'password_confirmation', 'token'),
@@ -480,15 +486,19 @@ class AuthController extends Controller
             ], 404);
         }
 
-        // Change the password on ECWID platform. (UNTESTED)
-        $ecwidResponse = EcwidUserController::updatePassword( $user->ecwidUserId, $fields['password'] );
-        // return $ecwidResponse;
-        if ( $ecwidResponse["updateCount"] !== 1 ) {
-            return response([
-                "status" => 502,
-                "message" => "Error cambiando la contraseña en la plataforma. No se guardaron cambios."
-            ], 502);
-        }
+        if ( env("PLATFORM") === "ecwid" ) {
+
+            // Change the password on ECWID platform. (UNTESTED)
+            $ecwidResponse = EcwidUserController::updatePassword( $user->ecwidUserId, $fields['password'] );
+            // return $ecwidResponse;
+            if ( $ecwidResponse["updateCount"] !== 1 ) {
+                return response([
+                    "status" => 502,
+                    "message" => "Error cambiando la contraseña en la plataforma. No se guardaron cambios."
+                ], 502);
+            }
+
+        }       
     
         // Change the password.
         try {

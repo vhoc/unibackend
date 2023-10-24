@@ -24,7 +24,7 @@ return new class extends Migration
                 'Arquitecto',
                 'Interiorista',
                 'Otro'
-            ]);
+            ])->nullable();
             $table->string('phone')->nullable();
             $table->rememberToken();
             $table->timestamps();

@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-// use Illuminate\Http\Request;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Http;
 
 class EcwidUserController extends Controller
@@ -59,6 +59,49 @@ class EcwidUserController extends Controller
             "status" => 400,
             "message" => $validEcwidConfig["message"]
         ];
+
+    }
+
+    // Get one user by ID.
+    public static function getById( $ecwidUserId ) {
+        $validEcwidConfig = validEcwidConfig();
+
+        if ( $validEcwidConfig["status"] === true ) {
+
+            $response = Http::withHeaders([
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => ( env('ECWID_API_SECRET_TOKEN') ) ? env('ECWID_API_SECRET_TOKEN') : env('ECWID_API_PUBLIC_TOKEN')
+            ])->get( env('ECWID_API_BASE_URL') . env('ECWID_STORE_ID') . "/customers/" . $ecwidUserId );
+    
+            if ( $response->successful() ) {
+    
+                $ecwidUser = $response->json();
+    
+                if ( $ecwidUser ) {
+                    return [
+                        "status" => 200,
+                        "user" => $ecwidUser
+                    ];
+                }
+    
+                return [
+                    "status" => 404,
+                    "message" => "User not found on Ecwid platform."
+                ];
+    
+            }
+
+            if ( $response->failed() ) {
+                return [
+                    "status" => 500,
+                    "remote_status" => $response->status(),
+                    "remote_body" => $response->json(),
+                    "message" => $response->reason(),
+                ];
+            }
+
+        }
 
     }
 
@@ -155,6 +198,29 @@ class EcwidUserController extends Controller
                 'Content-Type' => 'application/json',
                 'Authorization' => ( env('ECWID_API_SECRET_TOKEN') ) ? env('ECWID_API_SECRET_TOKEN') : env('ECWID_API_PUBLIC_TOKEN')
             ])->delete( env('ECWID_API_BASE_URL') . env('ECWID_STORE_ID') . "/customers/" . $customerId );
+
+            if ( $response->successful() ) {
+                return $response->json();
+            }
+
+            return $response;
+
+        }
+
+    }
+
+    public function updateShippingAddress( Request $request, $ecwidUserId ) {
+
+        if ( validEcwidConfig()["status"] === true ) {
+
+            $response = Http::withHeaders([
+                'method' => 'POST',
+                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                'Authorization' => ( env('ECWID_API_SECRET_TOKEN') ) ? env('ECWID_API_SECRET_TOKEN') : env('ECWID_API_PUBLIC_TOKEN')
+            ])->put( env('ECWID_API_BASE_URL') . env('ECWID_STORE_ID') . "/customers/" . $ecwidUserId, [
+                "shippingAddresses" => $request->shippingAddresses,
+            ] );
 
             if ( $response->successful() ) {
                 return $response->json();
