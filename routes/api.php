@@ -12,6 +12,9 @@ use App\Http\Controllers\MlaImageController;
 use App\Http\Controllers\MlaProductController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\MlaUserController;
+use App\Models\MlaContactMethod;
+use App\Http\Controllers\MlaContactMethodController;
+use App\Models\MlaImage;
 use App\Models\MlaProduct;
 
 /*
@@ -39,12 +42,6 @@ Route::post('login', [AuthController::class, 'login']);
 
 // Do verify email on clicking on the activate button.
 Route::get('/email/verify/{id}/{hash}', [AuthController::class, 'verifyEmail'])->name('verification.verify');
-// Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
-//     // error_log($request);
-//     // $request->fulfill();
- 
-//     // return redirect('/email/verification/successful');
-// })->name('verification.verify');
 
 // Unverified e-mail response.
 Route::get('/email/verify', function () {
@@ -139,6 +136,13 @@ Route::post('/mla/user/register', [MlaUserController::class, 'register']);
 // Products
 Route::get('/mla/user/{userId}/products', [MlaProductController::class, 'index']);
 Route::get('/mla/products/{productId}', [MlaProductController::class, 'show']);
+Route::get('/mla/products/{productId}', [MlaProductController::class, 'update']);
+
+// Product Images
+Route::get('/mla/products/{productId}/images', [MlaImageController::class, 'index']);
+
+// Contact Methods
+Route::get('/mla/contactMethods/{userId}', [MlaContactMethodController::class, 'index']);
 
 /*
 |--------------------------------------------------------------------------
@@ -147,6 +151,22 @@ Route::get('/mla/products/{productId}', [MlaProductController::class, 'show']);
 */
 Route::group(['middleware' => ['auth:sanctum']], function () {
 
+    // User
+    // Get one user
+    Route::get('/mla/user/{userId}', [AuthController::class, 'show']);
+
+    // Logout
+    Route::post('/mla/logout', [AuthController::class, 'logout']);
+
+    // Update user
+    Route::put('mla/user', [AuthController::class, 'update']);
+
+    // Update user's password
+    Route::put('mla/user/password', [AuthController::class, 'updatePassword']);
+
+    // Delete user
+    Route::delete('mla/user', [AuthController::class, 'deleteUser']);
+
     // Products
     Route::post('/mla/products', [MlaProductController::class, 'store']);
     Route::put('/mla/products/{productId}', [MlaProductController::class, 'update']);
@@ -154,5 +174,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Image Files
     Route::post('/mla/images', [MlaImageController::class, 'store']);
+
+    // Contact Methods
+    Route::post('/mla/contactMethods', [MlaContactMethodController::class, 'store']);
+    // Route::put('/mla/contactMethods', [MlaContactMethodController::class, 'update']);
+    Route::delete('/mla/contactMethods', [MlaContactMethodController::class, 'destroy']);
 
 });

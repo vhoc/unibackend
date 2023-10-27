@@ -16,10 +16,10 @@ class MlaUserController extends Controller
             'name' => 'required|string',
             'email' => 'required|string|unique:users,email',
             'password' => 'required|string|confirmed',
-            'whatsapp' => 'string',
-            'facebook' => 'string',
-            'contact_email' => 'email',
-            'phone' => 'string'
+            'whatsapp' => 'string|nullable',
+            'facebook' => 'string|nullable',
+            'contact_email' => 'email|nullable',
+            'phone' => 'string|nullable'
             
         ]);
 
@@ -72,17 +72,26 @@ class MlaUserController extends Controller
 
             $ce = MlaContactMethod::create($newContactEmail);
         }
+
+        try {
+            // Send verification email.
+            event(new Registered($user));
+
+            // Generate and send response with created local user.
+            $response = [
+                'user' => $user,
+            ];
+
+            // Return a sucess response.
+            return response( $response, 201 );
+        } catch (\Throwable $e) {
+            return response([
+                "status" => $e->code,
+                "message" => $e->message,
+            ]);
+        }
                 
-        // Send verification email.
-        event(new Registered($user));
-
-        // Generate and send response with created local user.
-        $response = [
-            'user' => $user,
-        ];
-
-        // Return a sucess response.
-        return response( $response, 201 );
+        
 
         // return response($request);
 

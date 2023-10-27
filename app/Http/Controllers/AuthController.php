@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Hash;
@@ -14,6 +16,9 @@ use Illuminate\Support\Facades\Password;
 use Illuminate\Validation\Rules\Password as Pass;
 use Illuminate\Auth\Events\PasswordReset;
 use Illuminate\Support\Str;
+use App\Models\MlaContactMethod;
+use App\Models\MlaImage;
+use App\Models\MlaProduct;
 
 class AuthController extends Controller
 {
@@ -225,15 +230,17 @@ class AuthController extends Controller
     /**
      * Delete user.
      */
-    public function deleteUser( Request $request ) {
-        
-        $request->validate([
-            'email' => 'required|email',
-        ]);
+    public function deleteUser( Request $request ) {        
+        // $request->validate([
+        //     'email' => 'required|email',
+        // ]);
 
         // Select the user
         try {
-            $user = User::where('email', $request->email)->first();
+            // $user = User::where('email', $request->email)->first();
+            $user = Auth::user();
+            $userId = $user->id;
+            $userObject = User::find($userId);
         } catch (\Throwable $th) {
             return response([
                 "status" => 404,
@@ -241,34 +248,68 @@ class AuthController extends Controller
             ], 404);
         }
 
-        // Delete the user from ECWID
-        $ecwidResponse = EcwidUserController::delete( $user->ecwidUserId );
+        if ( env("PLATFORM") === "ecwid" ) {
+            // Delete the user from ECWID
+            $ecwidResponse = EcwidUserController::delete( $user->ecwidUserId );
 
-        if ( $ecwidResponse["deleteCount"] !== 1 ) {
-            return response([
-                "status" => 502,
-                "message" => "Error al intentar eliminar al usuario en la plataforma."
-            ], 502);
-        }
+            if ( $ecwidResponse["deleteCount"] !== 1 ) {
+                return response([
+                    "status" => 502,
+                    "message" => "Error al intentar eliminar al usuario en la plataforma."
+                ], 502);
+            }
+        }        
 
         // Delete current token (logging user out)
         $request->user()->currentAccessToken()->delete();
 
-        // Delete the user from the local database.
-        try {
-            $user->delete();
+        if ( env("PLATFORM") === "milistapp" ) {
 
-            return response([
-                "status" => 200,
-                "message" => "El usuario y los datos ligados han sido eliminados del sistema."
-            ]);
+            // Delete the user from the local database.
+            try {
+                // Delete the user's upload folder and all its images.
+                if ( Storage::disk('public')->exists('uploads/' . strval($userObject->id)) ) {
+                    Storage::disk('public')->deleteDirectory('uploads/' . strval($userObject->id));
+                }
 
-        } catch (\Throwable $th) {
-            return response([
-                "status" => 500,
-                "message" => $th->getMessage()
-            ], 500);
+                // Get all product id's belonging to the user
+                $userProducts = MlaProduct::where('user_id', $userObject->id)->get();
+                $userProductsIds = [];
+                foreach ( $userProducts as $userProduct ) {
+                    array_push($userProductsIds, $userProduct->id);
+                }
+
+                // Get all images id's belonging to the user's products.
+                $imagesToDelete = MlaImage::whereIn('mla_product_id', $userProductsIds)->get();
+                $imagesIDsToDelete = [];
+                foreach ( $imagesToDelete as $imageToDelete ) {
+                    array_push($imagesIDsToDelete, $imageToDelete->id);
+                }
+
+                // Delete the user's products and their images from the DB.
+                MlaProduct::whereIn('id', $userProductsIds)->delete();
+                MlaImage::whereIn('id', $imagesIDsToDelete)->delete();
+
+                // Delete all the user's contact methods
+                MlaContactMethod::where('user_id', $userObject->id)->delete();
+
+                // Finally delete the user. Bye bye :')
+                $userObject->delete();
+
+                return response([
+                    "status" => 200,
+                    "message" => "El usuario y los datos ligados han sido eliminados del sistema."
+                ]);
+
+            } catch (\Throwable $th) {
+                return response([
+                    "status" => $th->getCode(),
+                    "message" => $th->getMessage()
+                ], $th->getCode());
+            }
+
         }
+        
 
     }
 
@@ -465,7 +506,7 @@ class AuthController extends Controller
         try {
             $fields = $request->validate([
                 'email' => 'required|email',
-                'password' => ['required', 'confirmed', Pass::min(8)->mixedCase()->numbers()->symbols()],
+                'password' => ['required', 'confirmed', Pass::min(8)],
             ]);
         } catch ( \Throwable $th ) {
 
@@ -517,6 +558,184 @@ class AuthController extends Controller
             ], 500);
         }
 
+    }
+
+    /**
+     * Register user (MLA)
+     */
+    public function register_mla( Request $request ) {
+
+        // Validate request data
+        $fields = $request->validate([
+            'name' => 'required|string',
+            'email' => 'required|string|unique:users,email',
+            'password' => 'required|string|confirmed',
+            'whatsapp' => 'string',
+            'facebook' => 'string',
+            'phone' => 'string',
+            'contact_email' => 'email',
+        ]);
+
+        $newUser = [
+            'name' => $fields['name'],
+            'email' => $fields['email'],
+            'password' => bcrypt( $fields['password'] ),
+        ];
+
+        try {
+            // Create local user
+            $user = User::create($newUser);
+                    
+            // Send verification email.
+            event(new Registered($user));
+
+            // Create the contact methods for the user;
+            if ( $fields["whatsapp"] ) {
+                MlaContactMethod::create([
+                    "user_id" => $user->id,
+                    "type" => "whatsapp",
+                    "value" => $fields["whatsapp"],
+                ]);
+            }
+
+            if ( $fields["facebook"] ) {
+                MlaContactMethod::create([
+                    "user_id" => $user->id,
+                    "type" => "facebook",
+                    "value" => $fields["facebook"],
+                ]);
+            }
+
+            if ( $fields["contact_email"] ) {
+                MlaContactMethod::create([
+                    "user_id" => $user->id,
+                    "type" => "contact_email",
+                    "value" => $fields["contact_email"],
+                ]);
+            }
+
+            if ( $fields["phone"] ) {
+                MlaContactMethod::create([
+                    "user_id" => $user->id,
+                    "type" => "phone",
+                    "value" => $fields["phone"],
+                ]);
+            }
+
+            // Generate and send response with created local user.
+            $response = [
+                'user' => $user,
+            ];
+
+            // Return a sucess response.
+            return response( $response, 201 );
+        } catch (\Throwable $e) {
+            return response([
+                "status" => $e->code,
+                "message" => $e->message,
+            ]);
+        }
+
+        
+
+    }
+
+    /**
+     * Get user data
+     */
+    public function show( $userId ) {
+
+        try {
+            $user = User::find( $userId );
+            return response([
+                "status" => 200,
+                "user" => $user,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response([
+                "status" => $e->code,
+                "message" => $e->message,
+            ], $e->code);
+        }
+
+    }
+
+    /**
+     * Update user that has no external platform (like ECWID)
+     */
+    public function update( Request $request ) {
+        // Validate request data
+        try {
+            $fields = $request->validate([
+                'id' => 'numeric',
+                'name' => 'string',
+                // 'email' => 'email',
+            ]);
+        } catch ( \Throwable $th ) {
+            return response([
+                "status" => 422,
+                "message" => $th->getMessage()
+            ], 422);
+        }
+
+        try {
+            $user = User::find( $fields['id'] );
+
+            $user->name = $fields['name'];
+            // $user->email = $fields['email'];
+
+            $user->save();
+
+            return response([
+                "status" => 200,
+                "message" => "El usuario ha sido actualizado.",
+                "user" => $user,
+            ], 200);
+        } catch (\Throwable $e) {
+            return response([
+                "status" => $e->code,
+                "message" => $e->message,
+            ], $e->code);
+        }
+    }
+
+    /**
+     * Update user's password that has no external platform (like ECWID)
+     */
+    public function updatePassword( Request $request ) {
+        // Validate request inputs.
+        try {
+            $fields = $request->validate([
+                'id' => 'required|numeric',
+                'password' => ['required', 'confirmed', Pass::min(8)],
+            ]);
+        } catch ( \Throwable $th ) {
+
+            return response([
+                "status" => 422,
+                "message" => $th->getMessage()
+            ], 422);
+
+        }
+        
+        // Locate the user by email.
+        $user = User::find( $fields['id'] );
+
+        if ( $user ) {
+            $user->password = Hash::make($request->password);
+    
+            $user->save();
+
+            return response([
+                "status" => 200,
+                "message" => "La contraseña ha sido cambiada."
+            ], 200);
+        } else {
+            return response([
+                "status" => 404,
+                "message" => "No se encontró al usuario."
+            ], 404);
+        }
     }
 
 }
