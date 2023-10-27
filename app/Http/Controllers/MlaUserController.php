@@ -93,10 +93,36 @@ class MlaUserController extends Controller
                 "message" => $e->message,
             ]);
         }
-                
-        
+    }
 
-        // return response($request);
+    public function show( $hexId ) {
+
+        try {
+
+            $user = User::where('hexId', $hexId)->first();
+
+            if ( $user ) {
+                return response([
+                    "status" => 200,
+                    "catalog" => [
+                        "id" => $user->id,
+                        "hexId" => $user->hexId,
+                        "name" => $user->name,
+                    ],
+                ], 200);
+            } else {
+                return response([
+                    "status" => 404,
+                    "message" => "No se encontró el catálogo"
+                ], 404);
+            }
+
+        } catch (\Throwable $e) {
+            return response([
+                "status" => $e->getCode(),
+                "message" => $e->getMessage(),
+            ], $e->getCode());
+        }       
 
     }
 }
