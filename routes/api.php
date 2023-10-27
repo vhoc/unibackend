@@ -4,6 +4,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\EcwidCategoryController;
+use App\Http\Controllers\EcwidCouponController;
 use App\Http\Controllers\EcwidOrderController;
 use App\Http\Controllers\EcwidProductCombinationController;
 use App\Http\Controllers\EcwidProductController;
@@ -92,6 +93,14 @@ Route::get('products/{productId}/combinations', [EcwidProductCombinationControll
 // Calculate
 Route::post('ecwid/order/calculate', [EcwidOrderController::class, 'calculate'])->name('order.calculate');
 
+// COUPONS
+    
+// Find Coupon
+Route::get('ecwid/discount_coupons/{code}', [EcwidCouponController::class, 'findCoupon']);
+
+// Validate Coupon
+Route::get('ecwid/discount_coupon/{code}', [EcwidCouponController::class, 'validateCoupon']);
+
 
 /*
 |--------------------------------------------------------------------------
@@ -120,7 +129,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Shipping Address update
     Route::put('ecwid/customers/{ecwidUserId}', [EcwidUserController::class, 'updateShippingAddress']);
-
     
 
 });
