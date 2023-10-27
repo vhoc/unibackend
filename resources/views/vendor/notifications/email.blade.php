@@ -47,13 +47,12 @@
 @isset($actionText)
 <x-slot:subcopy>
 @lang(
-    "Si el botón \":actionText\" no funciona, copia y pega la URL de abajo\n".
-    'en tu navegador web:',
+    "If you're having trouble clicking the \":actionText\" button, copy and paste the URL below\n".
+    'into your web browser:',
     [
         'actionText' => $actionText,
     ]
-) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span><br/>
-<p>O envía un correo a <a href="mailto:{{ env("SUPPORT_MAIL_ADDRESS") }}" target="_blank">{{ env("SUPPORT_MAIL_ADDRESS") }}</a> para brindarte apoyo</p>
+) <span class="break-all">[{{ $displayableActionUrl }}]({{ $actionUrl }})</span>
 </x-slot:subcopy>
 @endisset
 </x-mail::message>
