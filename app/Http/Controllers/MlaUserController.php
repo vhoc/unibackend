@@ -33,6 +33,9 @@ class MlaUserController extends Controller
         // Create local user
         $user = User::create($newUser);
 
+        $user->hexId = dechex($user->id);
+        $user->save();
+
         if ( $fields['whatsapp'] ) {
             $newWhatsapp = [
                 "user_id" => $user->id,

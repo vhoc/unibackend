@@ -348,13 +348,14 @@ class AuthController extends Controller
             'status' => 200,
             'message' => 'Autenticación exitosa.',
             'userId' => $user->id,
+            'hexId' => $user->hexId,
             'ecwidUserId' => $user->ecwidUserId,
             'type' => $user->type,
             'email' => $user->email,
             'phone' => $user->phone,
             'name' => $user->name,
             'active' => $user->email_verified_at ? true : false,
-            'user' => $user,
+            // 'user' => $user,
             'accessToken' => $token,
             'refreshToken' => ''// NOT NEEDED
         ];
