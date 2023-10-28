@@ -22,10 +22,8 @@
         <script src="{{ asset('assets/index-336e41f3.js') }}"></script>
         <script>
         // Initialize your React app
-        ReactDOM.render(
-            <Root />,
-            document.getElementById('root')
-        );
+        const domContainer = document.querySelector('#root');
+        ReactDOM.render(e(Root), domContainer);
     </script>
     </body>
 </html>
