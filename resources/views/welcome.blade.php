@@ -6,7 +6,6 @@
 
         <title>Laravel</title>
 
-        <link rel="stylesheet" href="{{ asset('assets/index-c091e5bf.css') }}">
 
         <!-- Fonts -->
         <link rel="preconnect" href="https://fonts.bunny.net">
@@ -18,12 +17,5 @@
         </style>
     </head>
     <body class="antialiased">
-        <div id="root"></div>
-        <script src="{{ asset('assets/index-336e41f3.js') }}"></script>
-        <script>
-        // Initialize your React app
-        const domContainer = document.querySelector('#root');
-        ReactDOM.render(e(Root), domContainer);
-    </script>
     </body>
 </html>
