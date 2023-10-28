@@ -349,7 +349,7 @@ class AuthController extends Controller
             'message' => 'Autenticación exitosa.',
             'userId' => $user->id,
             'hexId' => $user->hexId,
-            'ecwidUserId' => $user->ecwidUserId,
+            'ecwidUserId' => env("PLATFORM") === "ecwid" ? $user->ecwidUserId : "",
             'type' => $user->type,
             'email' => $user->email,
             'phone' => $user->phone,
