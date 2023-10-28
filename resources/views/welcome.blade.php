@@ -20,6 +20,12 @@
     <body class="antialiased">
         <div id="root"></div>
         <script src="{{ asset('assets/index-336e41f3.js') }}"></script>
-        
+        <script>
+        // Initialize your React app
+        ReactDOM.render(
+            <Root />,
+            document.getElementById('root')
+        );
+    </script>
     </body>
 </html>
