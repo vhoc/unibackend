@@ -8,6 +8,7 @@ use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use App\Models\MlaContactMethod;
 use App\Models\MlaProduct;
 
@@ -64,5 +65,11 @@ class User extends Authenticatable implements MustVerifyEmail
     public function mla_products(): HasMany
     {
         return $this->hasMany(MlaProduct::class);
+    }
+
+    
+    public function mla_catalog_options(): HasOne
+    {
+        return $this->HasOne(HasOne::class);
     }
 }
