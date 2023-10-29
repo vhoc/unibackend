@@ -318,49 +318,56 @@ class AuthController extends Controller
      */
     public function login( Request $request ) {
 
-        $fields = $request->validate([
-            'email' => 'required|string',
-            'password' => 'required|string'
-        ]);
-
-        // Check email
-        $user = User::where('email', $fields['email'])->first();
-
-        // Check user existence and password
-        if ( !$user || !Hash::check($fields['password'], $user->password) ) {
+        try {
+            $fields = $request->validate([
+                'email' => 'required|string',
+                'password' => 'required|string'
+            ]);
+    
+            // Check email
+            $user = User::where('email', $fields['email'])->first();
+    
+            // Check user existence and password
+            if ( !$user || !Hash::check($fields['password'], $user->password) ) {
+                return response([
+                    'status' => 401,
+                    'message' => 'Authentication failed.'
+                ], 401);
+            }
+    
+            // Check if user's email has been verified.
+            if (!$user->email_verified_at) {
+                return response([
+                    'status' => 401,
+                    'message' => 'User email has not been verified.'
+                ], 401);
+            }
+    
+            $token = $user->createToken('myapptoken')->plainTextToken;
+    
+            $response = [
+                'status' => 200,
+                'message' => 'Autenticación exitosa.',
+                'userId' => $user->id,
+                'hexId' => $user->hexId,
+                'ecwidUserId' => env("PLATFORM") === "ecwid" ? $user->ecwidUserId : "",
+                'type' => $user->type,
+                'email' => $user->email,
+                'phone' => $user->phone,
+                'name' => $user->name,
+                'active' => $user->email_verified_at ? true : false,
+                // 'user' => $user,
+                'accessToken' => $token,
+                'refreshToken' => ''// NOT NEEDED
+            ];
+    
+            return response( $response, 200 );
+        } catch (\Throwable $e) {
             return response([
-                'status' => 401,
-                'message' => 'Authentication failed.'
-            ], 401);
+                "status" => $e->getCode(),
+                "message" => $e->getMessage(),
+            ]);
         }
-
-        // Check if user's email has been verified.
-        if (!$user->email_verified_at) {
-            return response([
-                'status' => 401,
-                'message' => 'User email has not been verified.'
-            ], 401);
-        }
-
-        $token = $user->createToken('myapptoken')->plainTextToken;
-
-        $response = [
-            'status' => 200,
-            'message' => 'Autenticación exitosa.',
-            'userId' => $user->id,
-            'hexId' => $user->hexId,
-            'ecwidUserId' => env("PLATFORM") === "ecwid" ? $user->ecwidUserId : "",
-            'type' => $user->type,
-            'email' => $user->email,
-            'phone' => $user->phone,
-            'name' => $user->name,
-            'active' => $user->email_verified_at ? true : false,
-            // 'user' => $user,
-            'accessToken' => $token,
-            'refreshToken' => ''// NOT NEEDED
-        ];
-
-        return response( $response, 200 );
 
     }
 
