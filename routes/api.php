@@ -11,6 +11,7 @@ use App\Http\Controllers\EcwidProductController;
 use App\Http\Controllers\EcwidUserController;
 use App\Http\Controllers\MlaImageController;
 use App\Http\Controllers\MlaProductController;
+use App\Http\Controllers\MlaCatalogOptionsController;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\MlaUserController;
 use App\Models\MlaContactMethod;
@@ -153,6 +154,10 @@ Route::get('/mla/products/{productId}/images', [MlaImageController::class, 'inde
 
 // Contact Methods
 Route::get('/mla/contactMethods/{userId}', [MlaContactMethodController::class, 'index']);
+
+// Catalog Options
+Route::get('/mla/catalogOptions/{userId}', [MlaCatalogOptionsController::class, 'index']);
+
 
 /*
 |--------------------------------------------------------------------------
