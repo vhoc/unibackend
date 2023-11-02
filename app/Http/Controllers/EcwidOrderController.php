@@ -48,4 +48,24 @@ class EcwidOrderController extends Controller
         ];
 
     }
+
+    /** Create order on ECWID */
+    public function create( Request $request ) {
+
+        $payload = $request->all();
+
+        // return json_encode($payload);
+
+        $response = Http::withHeaders([
+            'User-Agent' => 'insomnia/2023.5.8',
+            'Content-Type' => 'application/json',
+            'Authorization' => 'Bearer secret_kypvdiibMGP31Qhtr52wFc3WF1s95c5Y',
+            // 'Authorization' => ( env('ECWID_API_SECRET_TOKEN') ) ? env('ECWID_API_SECRET_TOKEN') : env('ECWID_API_PUBLIC_TOKEN')
+        ])
+        ->acceptJson()
+        ->post( 'https://app.ecwid.com/api/v3/80090525/orders', $payload );
+        
+        return response($response);
+
+    }
 }

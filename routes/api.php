@@ -12,6 +12,7 @@ use App\Http\Controllers\EcwidUserController;
 use App\Http\Controllers\MlaImageController;
 use App\Http\Controllers\MlaProductController;
 use App\Http\Controllers\MlaCatalogOptionsController;
+use App\Models\CatalogOptions;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\MlaUserController;
 use App\Models\MlaContactMethod;
@@ -93,6 +94,9 @@ Route::get('products/{productId}/combinations', [EcwidProductCombinationControll
 
 // Calculate
 Route::post('ecwid/order/calculate', [EcwidOrderController::class, 'calculate'])->name('order.calculate');
+
+// Create Order
+Route::post('ecwid/order', [EcwidOrderController::class, 'create']);
 
 // COUPONS
     
@@ -189,6 +193,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Image Files
     Route::post('/mla/images', [MlaImageController::class, 'store']);
+    Route::post('/mla/catalog/images', [CatalogOptions::class, 'updateImage']);
 
     // Contact Methods
     Route::post('/mla/contactMethods', [MlaContactMethodController::class, 'store']);
