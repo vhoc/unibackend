@@ -47,7 +47,14 @@ class MlaCatalogOptionsController extends Controller
 
                 // Store the new uploaded image.
                 Storage::disk('public')->makeDirectory('uploads/' . strval($userId) );
-                $path = $request->file('file')->storeAs('public/uploads/' . strval($userId) . '/' . 'hero-image.jpg');                
+                try {
+                    $path = $request->file('file')->storeAs('public/uploads/' . strval($userId) . '/' . 'hero-image.jpg');
+                } catch (\Throwable $e) {
+                    return response([
+                        "status" => $e->getCode(),
+                        "message" => $e->getMessage(),
+                    ]);
+                }
 
                 // Check if this product has an image according to the DB.
                 $userOptions = CatalogOptions::where('user_id', $userId)->first();
