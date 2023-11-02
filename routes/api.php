@@ -12,7 +12,6 @@ use App\Http\Controllers\EcwidUserController;
 use App\Http\Controllers\MlaImageController;
 use App\Http\Controllers\MlaProductController;
 use App\Http\Controllers\MlaCatalogOptionsController;
-use App\Models\CatalogOptions;
 use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\MlaUserController;
 use App\Models\MlaContactMethod;
@@ -193,7 +192,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Image Files
     Route::post('/mla/images', [MlaImageController::class, 'store']);
-    Route::post('/mla/catalog/images', [CatalogOptions::class, 'updateImage']);
+    Route::post('/mla/catalog/images', [MlaCatalogOptionsController::class, 'updateImage']);
 
     // Contact Methods
     Route::post('/mla/contactMethods', [MlaContactMethodController::class, 'store']);
