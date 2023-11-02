@@ -66,14 +66,14 @@ class MlaCatalogOptionsController extends Controller
                     //     Storage::disk('public')->delete('uploads/' . strval($userId) . '/' . 'hero-image.jpg');
                     // }
 
-                    $userOptions->heading_image_url = env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg';
+                    $userOptions->heading_image_url = env("APP_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg';
                     $userOptions->save();
                     
                 // if not, create a new record.
                 } else {
                     $newCatalogOption = CatalogOptions::create([
                         "user_id" => $userId,
-                        "heading_image_url" => env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg',
+                        "heading_image_url" => env("APP_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg',
                     ]);
                     $newCatalogOption->save();
                 }
@@ -82,7 +82,7 @@ class MlaCatalogOptionsController extends Controller
             return response([
                 "status" => 201,
                 "message" => "El archivo ha sido subido correctamente.",
-                "image_url" => env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg',// THIS WILL REQUIRE UPGRADE WHEN SUPPORTING MULTIPLE IMAGES
+                "image_url" => env("APP_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg',// THIS WILL REQUIRE UPGRADE WHEN SUPPORTING MULTIPLE IMAGES
             ], 201);
         } catch (\Throwable $error) {
             return response([

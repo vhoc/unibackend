@@ -50,7 +50,7 @@ class MlaImageController extends Controller
                         Storage::disk('public')->delete('uploads/' . strval($userId) . '/' . $currentImage->filename);
                     }
 
-                    $currentImage->url = env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName;
+                    $currentImage->url = env("APP_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName;
                     $currentImage->save();
 
                     
@@ -58,7 +58,7 @@ class MlaImageController extends Controller
                 } else {
                     $newImage = MlaImage::create([
                         "mla_product_id" => $productId,
-                        "url" => env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName,
+                        "url" => env("APP_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName,
                         "filename" => $originalFileName,
                     ]);
                     $newImage->save();
@@ -68,7 +68,7 @@ class MlaImageController extends Controller
             return response([
                 "status" => 201,
                 "message" => "El archivo ha sido subido correctamente.",
-                "image_url" => env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName,// THIS WILL REQUIRE UPGRADE WHEN SUPPORTING MULTIPLE IMAGES
+                "image_url" => env("APP_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName,// THIS WILL REQUIRE UPGRADE WHEN SUPPORTING MULTIPLE IMAGES
             ], 201);
         } catch (\Throwable $error) {
             return response([
