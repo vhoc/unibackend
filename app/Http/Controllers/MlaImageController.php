@@ -38,7 +38,7 @@ class MlaImageController extends Controller
 
                 // Store the new uploaded image.
                 Storage::disk('public')->makeDirectory('uploads/' . strval($userId) );
-                $path = $request->file('file')->storeAs('public/uploads/' . strval($userId) . '/' . $originalFileName);                
+                $path = $request->file('file')->storeAs('public/uploads/' . strval($userId) . '/' . $originalFileName);
 
                 // Check if this product has an image according to the DB.
                 $currentImage = MlaImage::where('mla_product_id', $productId)->first();

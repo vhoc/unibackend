@@ -73,7 +73,7 @@ class MlaCatalogOptionsController extends Controller
                 } else {
                     $newCatalogOption = CatalogOptions::create([
                         "user_id" => $userId,
-                        "heading_image_url" => env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg',
+                        "heading_image_url" => env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName,
                     ]);
                     $newCatalogOption->save();
                 }
