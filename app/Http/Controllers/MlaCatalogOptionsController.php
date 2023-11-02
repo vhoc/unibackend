@@ -62,9 +62,9 @@ class MlaCatalogOptionsController extends Controller
                 // If an image assossiated with a userID exists, update the URL in the database,
                 if ( $userOptions ) {
                     // We have to delete the image first before in the DB, otherwise we lose the current filename.
-                    if ( Storage::disk('public')->exists('uploads/' . strval($userId) . '/' . 'hero-image.jpg') ) {
-                        Storage::disk('public')->delete('uploads/' . strval($userId) . '/' . 'hero-image.jpg');
-                    }
+                    // if ( Storage::disk('public')->exists('uploads/' . strval($userId) . '/' . 'hero-image.jpg') ) {
+                    //     Storage::disk('public')->delete('uploads/' . strval($userId) . '/' . 'hero-image.jpg');
+                    // }
 
                     $userOptions->heading_image_url = env("FRONTEND_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg';
                     $userOptions->save();
