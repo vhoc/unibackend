@@ -39,7 +39,7 @@ class MlaCatalogOptionsController extends Controller
         $userOptions = CatalogOptions::where('user_id', $userId)->first();
 
         $fields = $request->validate([
-            'user_id' => 'required|string',
+            'user_id' => 'required|alpha_num',
             'background_color_1' => 'string|nullable',
             'background_color_2' => 'string|nullable',
             'background_gradient_shape' => 'string|nullable',
