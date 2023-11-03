@@ -32,6 +32,53 @@ class MlaCatalogOptionsController extends Controller
 
     }
 
+    public function update( Request $request ) {
+
+        $user = Auth::user();
+        $userId = $user->id;
+        $userOptions = CatalogOptions::where('user_id', $userId)->first();
+
+        $fields = $request->validate([
+            'user_id' => 'required|string',
+            'background_color_1' => 'string|nullable',
+            'background_color_2' => 'string|nullable',
+            'background_gradient_shape' => 'string|nullable',
+            'custom_title' => 'string|nullable',
+            'custom_subtitle' => 'string|nullable',
+            'color_title' => 'string|nullable',
+            'color_subtitle' => 'string|nullable',
+        ]);
+
+        // $product = [
+        //     'title' => $fields['title'],
+        //     'description' => $fields['description'],
+        //     'price' => $fields['price'],
+        // ];
+
+        try {
+            // UPDATE IN THE DATABASE 
+            $userOptions->user_id = $fields['user_id'];
+            $userOptions->background_color_1 = $fields['background_color_1'];
+            $userOptions->background_color_2 = $fields['background_color_2'];
+            $userOptions->background_gradient_shape = $fields['background_gradient_shape'];
+            $userOptions->custom_title = $fields['custom_title'];
+            $userOptions->custom_subtitle = $fields['custom_subtitle'];
+            $userOptions->color_title = $fields['color_title'];
+            $userOptions->color_subtitle = $fields['color_subtitle'];
+            
+            // Save all the changes
+            $userOptions->save();
+
+            return response( $userOptions, 200 );
+        } catch ( \Throwable $e ) {
+            return response([
+                "status" => $e->getCode(),
+                "message" => $e->getMessage(),
+            ]);
+        }
+
+    }
+
     public function updateImage( Request $request ) {
 
         $user = Auth::user();

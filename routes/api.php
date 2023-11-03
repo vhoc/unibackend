@@ -16,6 +16,7 @@ use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\MlaUserController;
 use App\Models\MlaContactMethod;
 use App\Http\Controllers\MlaContactMethodController;
+use App\Http\Controllers\StripeController;
 use App\Models\MlaImage;
 use App\Models\MlaProduct;
 
@@ -133,6 +134,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Shipping Address update
     Route::put('ecwid/customers/{ecwidUserId}', [EcwidUserController::class, 'updateShippingAddress']);
+
+    // STRIPE
+    Route::get('stripe/countryside', [StripeController::class, 'key']);
+    Route::post('stripe/payment-sheet', [StripeController::class, 'paymentSheet']);
     
 
 });
@@ -193,6 +198,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     // Image Files
     Route::post('/mla/images', [MlaImageController::class, 'store']);
     Route::post('/mla/catalog/images', [MlaCatalogOptionsController::class, 'updateImage']);
+
+    // Catalog Options
+    Route::put('/mla/catalogOptions', [MlaCatalogOptionsController::class, 'update']);
 
     // Contact Methods
     Route::post('/mla/contactMethods', [MlaContactMethodController::class, 'store']);
