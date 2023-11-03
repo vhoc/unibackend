@@ -20,6 +20,8 @@ return new class extends Migration
             $table->string('background_gradient_shape')->nullable()->default('radial-gradient');
             $table->string('custom_title')->nullable();
             $table->string('custom_subtitle')->nullable();
+            $table->string('color_title')->nullable();
+            $table->string('color_subtitle')->nullable();
             $table->timestamps();
         });
     }
