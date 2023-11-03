@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\CatalogOptions;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 // use App\Models\MlaImage;
 
 class MlaCatalogOptionsController extends Controller
@@ -95,7 +96,8 @@ class MlaCatalogOptionsController extends Controller
                 // Store the new uploaded image.
                 Storage::disk('public')->makeDirectory('uploads/' . strval($userId) );
                 try {
-                    $path = $request->file('file')->storeAs('public/uploads/' . strval($userId) . '/' . 'hero-image.jpg');
+                    $path = $request->file('file')->storeAs('public/uploads/' . strval($userId) . '/' . $originalFileName);
+
                 } catch (\Throwable $e) {
                     return response([
                         "status" => $e->getCode(),
@@ -103,24 +105,25 @@ class MlaCatalogOptionsController extends Controller
                     ]);
                 }
 
-                // Check if this product has an image according to the DB.
                 $userOptions = CatalogOptions::where('user_id', $userId)->first();
-
                 // If an image assossiated with a userID exists, update the URL in the database,
                 if ( $userOptions ) {
-                    // We have to delete the image first before in the DB, otherwise we lose the current filename.
-                    // if ( Storage::disk('public')->exists('uploads/' . strval($userId) . '/' . 'hero-image.jpg') ) {
-                    //     Storage::disk('public')->delete('uploads/' . strval($userId) . '/' . 'hero-image.jpg');
-                    // }
+                    // Get current image filename
+                    $currentImageFileName = Str::afterLast($userOptions->heading_image_url, '/');
 
-                    $userOptions->heading_image_url = env("APP_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg';
+                    // We have to delete the image first before in the DB, otherwise we lose the current filename.
+                    if ( Storage::disk('public')->exists('uploads/' . strval($userId) . '/' . $currentImageFileName) ) {
+                        Storage::disk('public')->delete('uploads/' . strval($userId) . '/' . $currentImageFileName);
+                    }
+
+                    $userOptions->heading_image_url = env("APP_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName;
                     $userOptions->save();
                     
                 // if not, create a new record.
                 } else {
                     $newCatalogOption = CatalogOptions::create([
                         "user_id" => $userId,
-                        "heading_image_url" => env("APP_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg',
+                        "heading_image_url" => env("APP_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName,
                     ]);
                     $newCatalogOption->save();
                 }
@@ -129,7 +132,7 @@ class MlaCatalogOptionsController extends Controller
             return response([
                 "status" => 201,
                 "message" => "El archivo ha sido subido correctamente.",
-                "image_url" => env("APP_URL") . '/uploads/' . strval($userId) . '/' . 'hero-image.jpg',// THIS WILL REQUIRE UPGRADE WHEN SUPPORTING MULTIPLE IMAGES
+                "image_url" => env("APP_URL") . '/uploads/' . strval($userId) . '/' . $originalFileName,// THIS WILL REQUIRE UPGRADE WHEN SUPPORTING MULTIPLE IMAGES
             ], 201);
         } catch (\Throwable $error) {
             return response([
