@@ -85,18 +85,20 @@ class MlaProductController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, MlaProduct $productId)
+    public function update(Request $request)
     {
         $user = Auth::user();
         $userId = $user->id;
         
         $fields = $request->validate([
+            'id' => 'required',
             'title' => 'required|string',
             'description' => 'string|nullable',
             'price' => 'required|numeric',
         ]);
 
         $product = [
+            'id' => $fields['id'],
             'title' => $fields['title'],
             'description' => $fields['description'],
             'price' => $fields['price'],
@@ -104,7 +106,7 @@ class MlaProductController extends Controller
 
         try {
             // UPDATE IN THE DATABASE 
-            $currentProduct = MlaProduct::where('id', $productId)->first();
+            $currentProduct = MlaProduct::where('id', $product['id'])->first();
             return response($currentProduct, 203);
             $currentProduct->title = $product['title'];
             $currentProduct->description = $product['description'];

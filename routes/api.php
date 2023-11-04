@@ -192,7 +192,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     // Products
     Route::post('/mla/products', [MlaProductController::class, 'store']);
-    Route::put('/mla/products/{productId}', [MlaProductController::class, 'update']);
+    Route::put('/mla/products', [MlaProductController::class, 'update']);
     Route::delete('mla/products/{productId}', [MlaProductController::class, 'destroy']);
 
     // Image Files
