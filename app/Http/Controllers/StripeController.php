@@ -17,13 +17,13 @@ class StripeController extends Controller
         $sk = (string)env('STRIPE_SECRET_KEY');
         
         try {
-            Stripe::setApiKey(config( $sk ));
+            Stripe::setApiKey( 'sk_test_51O8RA6LuyaSDkpjFLFQD6JlvqhqeOG7gxPE54WQrbqHPpM2gUVvsn5Gr9jkUluc1dYaCqjzIOiAOhYKbMJrSALLg00UAKUmd8w' );
 
             // Use an existing Customer ID if this is a returning customer.
             $customer = Customer::create();
             $ephemeralKey = EphemeralKey::create(
                 ['customer' => $customer->id],
-                ['api_version' => '2022-08-01']
+                ['stripe_version' => '2022-08-01']
             );
 
             $paymentIntent = PaymentIntent::create([
