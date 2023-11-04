@@ -107,7 +107,7 @@ class MlaProductController extends Controller
         try {
             // UPDATE IN THE DATABASE 
             $currentProduct = MlaProduct::where('id', $product['id'])->first();
-            return response($currentProduct, 203);
+            // return response($currentProduct, 203);
             $currentProduct->title = $product['title'];
             $currentProduct->description = $product['description'];
             $currentProduct->price = $product['price'];
