@@ -154,7 +154,7 @@ Route::get('/mla/catalog/{hexId}', [MlaUserController::class, 'show']);
 
 // Products
 Route::get('/mla/user/{userId}/products', [MlaProductController::class, 'index']);
-Route::get('/mla/products/{productId}', [MlaProductController::class, 'show']);
+Route::get('/mla/products/{productHexId}', [MlaProductController::class, 'show']);
 Route::get('/mla/products/{productId}', [MlaProductController::class, 'update']);
 
 // Product Images

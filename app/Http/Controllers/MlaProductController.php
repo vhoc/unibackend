@@ -77,9 +77,18 @@ class MlaProductController extends Controller
     /**
      * Display the specified resource.
      */
-    public function show(MlaProduct $mlaProduct)
+    public function show( $productHexId )
     {
-        //
+        $product = MlaProduct::where( 'hexId', $productHexId )->first();
+
+        if ( $product ) {
+            return response( $product, 200 );
+        } else {
+            return response([
+                "status" => 404,
+                "message" => "El producto especificado no existe."
+            ], 404); 
+        }
     }
 
     /**
