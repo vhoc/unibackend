@@ -151,6 +151,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::post('/mla/user/register', [MlaUserController::class, 'register']);
 Route::post('/mla/login', [AuthController::class, 'login']);
 Route::get('/mla/catalog/{hexId}', [MlaUserController::class, 'show']);
+Route::get('/mla/catalog/id/{id}', [MlaUserController::class, 'showById']);
 
 // Products
 Route::get('/mla/user/{userId}/products', [MlaProductController::class, 'index']);

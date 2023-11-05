@@ -125,4 +125,35 @@ class MlaUserController extends Controller
         }       
 
     }
+
+    public function showById( $id ) {
+
+        try {
+
+            $user = User::where('id', $id)->first();
+
+            if ( $user ) {
+                return response([
+                    "status" => 200,
+                    "catalog" => [
+                        "id" => $user->id,
+                        "hexId" => $user->hexId,
+                        "name" => $user->name,
+                    ],
+                ], 200);
+            } else {
+                return response([
+                    "status" => 404,
+                    "message" => "No se encontró el catálogo"
+                ], 404);
+            }
+
+        } catch (\Throwable $e) {
+            return response([
+                "status" => $e->getCode(),
+                "message" => $e->getMessage(),
+            ], $e->getCode());
+        }       
+
+    }
 }
