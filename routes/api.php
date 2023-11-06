@@ -39,6 +39,10 @@ Route::get('/test', function() {
     return 'Holi';
 });
 
+Route::get('/webhook-test', function( Request $request ) {
+    return response($request, 201);
+});
+
 // Auth
 Route::post('register', [AuthController::class, 'register']);
 Route::post('login', [AuthController::class, 'login']);
