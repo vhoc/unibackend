@@ -39,7 +39,7 @@ Route::get('/test', function() {
     return 'Holi';
 });
 
-Route::get('/webhook-test', function( Request $request ) {
+Route::post('/webhook-test', function( Request $request ) {
     return response($request, 201);
 });
 
