@@ -35,7 +35,7 @@ use App\Models\MlaProduct;
 | PUBLIC ROUTES
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->get('/test', function() {
+Route::get('/test', function() {
     return 'Holi';
 });
 
