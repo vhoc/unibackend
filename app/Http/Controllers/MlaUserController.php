@@ -11,7 +11,7 @@ class MlaUserController extends Controller
 {
     public function index() {
 
-        $catalogs = User::where('email_verified_at', !null)->get();
+        $catalogs = User::whereNotNull('email_verified_at')->get();
 
         if ( $catalogs ) {
             return response($catalogs, 200);
