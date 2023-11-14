@@ -9,7 +9,7 @@ class EcwidProductController extends Controller
 {
     
     /**
-     * Get all categories
+     * Get all products
      */
     public function search( Request $request ) {
         

@@ -9,6 +9,21 @@ use Illuminate\Auth\Events\Registered;
 
 class MlaUserController extends Controller
 {
+    public function index() {
+
+        $catalogs = User::where('email_verified_at', !null)->get();
+
+        if ( $catalogs ) {
+            return response($catalogs, 200);
+        } else {
+            return response([
+                'status' => 404,
+                'message' => "No existen catálogos"
+            ]);
+        }
+
+    }
+
     public function register( Request $request ) {
 
         // Validate request data
