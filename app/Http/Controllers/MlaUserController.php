@@ -11,7 +11,7 @@ class MlaUserController extends Controller
 {
     public function index() {
 
-        $catalogs = User::whereNotNull('email_verified_at')->get();
+        $catalogs = User::whereNotNull('email_verified_at')->get()->map()->only(['id', 'hexId', 'name']);
 
         if ( $catalogs ) {
             return response($catalogs, 200);
