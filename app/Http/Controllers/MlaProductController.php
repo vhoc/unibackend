@@ -6,6 +6,7 @@ use App\Models\MlaProduct;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use App\Models\User;
+use App\Models\MlaUsersTiers;
 use App\Models\MlaImage;
 use Illuminate\Support\Facades\Storage;
 
@@ -45,6 +46,22 @@ class MlaProductController extends Controller
 
         $user = Auth::user();
         $userId = $user->id;
+        $currentProductCount = MlaProduct::where('user_id', $userId)->count();
+        $maxProducts = env('TIER0_MAX_PRODUCTS');
+
+        // Check user tier and set the max products accordingly
+        $tier = MlaUsersTiers::where('user_id', $userId)->first();
+        
+        if ( $tier && $tier->tier === 1 ) {
+            $maxProducts = env('TIER1_MAX_PRODUCTS');
+        }
+
+        if ( $currentProductCount >= $maxProducts ) {
+            return response([
+                "status" => 403,
+                "message" => "Haz alcanzado el límite de productos que puedes agregar (" . $maxProducts . ")"
+            ], 403);
+        }
         
         $fields = $request->validate([
             'title' => 'required|string',
